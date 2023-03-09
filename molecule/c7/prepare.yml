@@ -1,0 +1,17 @@
+---
+
+- name: Prepare
+  hosts: all
+  pre_tasks:
+    - name: Setup Mirror Issue for Centos 8
+      ansible.builtin.shell: |
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        sed -i 's/best=True/best=False/g' /etc/dnf/dnf.conf
+      when:
+        - ansible_distribution in ['CentOS']
+        - ansible_distribution_major_version in ['8']
+
+  # roles:
+  #   - role_epel_repo
+  #   - roles/role-epel-repo

@@ -1,8 +1,5 @@
 ---
 # tasks file for role_java
 
-- name: Install OpenJDK from Repository
-  ansible.builtin.yum:
-    name:
-      - "{{ java_package_name }}"
-    state: present
+- name: Install Java Setup from {{ java_setup }}
+  ansible.builtin.include_tasks: install-{{ java_setup }}.yml

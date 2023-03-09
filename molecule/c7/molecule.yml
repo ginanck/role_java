@@ -1,0 +1,63 @@
+---
+
+dependency:
+  name: galaxy
+  # name: shell
+  # ignore-certs: True
+  # ignore-errors: True
+  # command: ./install-requirements
+driver:
+  name: docker
+lint: |
+  set -e
+  if [[ -f ".yamllint" ]]; then
+    yamllint .
+  else
+    yamllint -c .git/yamllint.conf .
+  fi
+  if [[ -f ".ansible-lint" ]]; then
+    ansible-lint
+  else
+    ansible-lint -c .git/ansible-lint.conf
+  fi
+  if [[ -f ".flake8" ]]; then
+    flake8
+  else
+    flake8 --config .git/flake8.conf
+  fi
+platforms:
+  - name: centos-7
+    image: centos:centos7.9.2009
+    pre_build_image: true
+    privileged: true
+    command: /usr/sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+scenario:
+  name: c7
+  test_sequence:
+    - lint
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - destroy
+provisioner:
+  name: ansible
+  log: true
+  config_options:
+    defaults:
+      remote_tmp: /tmp/.ansible
+  playbooks:
+    prepare: repare.yml
+    converge: converge.yml
+verifier:
+  name: testinfra

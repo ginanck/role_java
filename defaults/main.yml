@@ -1,5 +1,11 @@
 ---
 # defaults file for role_java
 
-java_version: 1.8.0
-java_package_name: java-{{ java_version }}-openjdk
+# java_version: 1.8.0
+# java_package_name: java-{{ java_version }}-openjdk
+
+java_version: 17
+java_path: /opt/java
+java_setup: archive
+java_package_name: jdk-{{ java_version }}_linux-aarch64_bin.tar.gz
+java_package_url: https://download.oracle.com/java/{{ java_version }}/latest/{{ java_package_name }}
