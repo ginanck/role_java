@@ -1,0 +1,10 @@
+[flake8]
+ignore = E123,E133,E226,E241,E242,E501,E302
+exclude =
+  .git,
+  .mypy_cache,
+  .tox,
+  venv,
+  roles,
+  plugins,
+  __pycache__

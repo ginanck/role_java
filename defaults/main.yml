@@ -1,0 +1,5 @@
+---
+# defaults file for role_java
+
+java_version: 1.8.0
+java_package_name: java-{{ java_version }}-openjdk
