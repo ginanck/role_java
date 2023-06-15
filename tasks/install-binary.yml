@@ -1,0 +1,59 @@
+---
+
+- name: create a directory if it does not exist {{ java.filename }}
+  ansible.builtin.file:
+    path: "{{ java_path }}"
+    state: directory
+    mode: '0755'
+
+- name: get stats JDK archive {{ java.filename }}
+  ansible.builtin.stat:
+    path: "{{ java_path }}/{{ java.filename }}"
+    get_checksum: no
+  register: register_java_archive
+
+- name: download {{ java.filename }}
+  ansible.builtin.get_url:
+    url: "{{ java.url }}"
+    dest: "{{ java_path }}"
+    tmp_dest: "{{ java_path }}"
+    owner: root
+    group: root
+    mode: '0755'
+  when: not register_java_archive.stat.exists
+
+- name: unarchive file {{ java.filename }}
+  ansible.builtin.unarchive:
+    src: "{{ java_path }}/{{ java.filename }}"
+    dest: "{{ java_path }}"
+    list_files: true
+    remote_src: true
+  register: register_unarchive
+
+- name: set system-wide JAVA_HOME permanently for {{ java.filename }}
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/java.sh
+    regexp: '^JAVA_HOME='
+    line: "JAVA_HOME=\"{{ java_path }}/{{ register_unarchive.files[0] | split('/') | first }}\""
+    create: true
+    state: present
+  when:
+    - java.default | default(false)
+
+- name: set PATH for system-wide {{ java.filename }}
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/java.sh
+    regexp: '^export PATH='
+    line: "export PATH=\"${JAVA_HOME}/bin:$PATH\""
+    create: true
+    state: present
+  when:
+    - java.default | default(false)
+
+- name: set JAVA_HOME for users
+  include_tasks: user-set-java.yml
+  when:
+    - java.users is defined
+  with_items: "{{ java.users }}"
+  loop_control:
+    loop_var: user

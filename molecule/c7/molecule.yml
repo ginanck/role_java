@@ -2,10 +2,6 @@
 
 dependency:
   name: galaxy
-  # name: shell
-  # ignore-certs: True
-  # ignore-errors: True
-  # command: ./install-requirements
 driver:
   name: docker
 lint: |

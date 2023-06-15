@@ -1,0 +1,28 @@
+---
+
+- name: get JAVA_HOME for for {{ user }}
+  ansible.builtin.shell: ls -la | grep -i {{ java.version }} | awk '{print $9}' | grep -iv tar.gz
+  args:
+    chdir: "{{ java_path }}/"
+  register: result
+
+- name: get {{ user }} details
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ user }}"
+
+- name: set Java HOME ~/.bashrc for {{ user }}
+  ansible.builtin.lineinfile:
+    path: "{{ getent_passwd[user][4] }}/.bashrc"
+    regexp: '^export JAVA_HOME='
+    line: "export JAVA_HOME=\"{{ java_path }}/{{ result.stdout_lines[0] }}\""
+    create: true
+    state: present
+
+- name: set PATH ~/.bashrc for {{ user }}
+  ansible.builtin.lineinfile:
+    path: "{{ getent_passwd[user][4] }}/.bashrc"
+    regexp: '^export PATH='
+    line: "export PATH=\"${JAVA_HOME}/bin:$PATH\""
+    create: true
+    state: present

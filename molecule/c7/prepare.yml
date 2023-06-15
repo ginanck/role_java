@@ -11,7 +11,3 @@
       when:
         - ansible_distribution in ['CentOS']
         - ansible_distribution_major_version in ['8']
-
-  # roles:
-  #   - role_epel_repo
-  #   - roles/role-epel-repo
