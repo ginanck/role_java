@@ -30,28 +30,17 @@
     remote_src: true
   register: register_unarchive
 
-- name: set system-wide JAVA_HOME permanently for {{ java.filename }}
-  ansible.builtin.lineinfile:
-    path: /etc/profile.d/java.sh
-    regexp: '^export JAVA_HOME='
-    line: "export JAVA_HOME=\"{{ java_path }}/{{ register_unarchive.files[0] | split('/') | first }}\""
-    create: true
-    state: present
-  when:
-    - java.default | default(false)
-
-- name: add JAVA_HOME to PATH for {{ java.filename }}
-  ansible.builtin.lineinfile:
-    path: /etc/profile.d/java.sh
-    regexp: '^export PATH='
-    line: "export PATH=\"${JAVA_HOME}/bin:$PATH\""
-    create: true
-    state: present
-  when:
-    - java.default | default(false)
-
-- name: source JAVA_HOME and PATH system-wide
-  ansible.builtin.shell: source /etc/profile.d/java.sh
+- name: set default Java version
+  community.general.alternatives:
+    name: "{{ alternative }}"
+    path: "{{ java_path }}/{{ register_unarchive.files[0] | split('/') | first }}/bin/{{ alternative }}"
+    link: /bin/{{ alternative }}
+    state: selected
+  with_items:
+    - java
+    - keytool
+  loop_control:
+    loop_var: alternative
   when:
     - java.default | default(false)
 
