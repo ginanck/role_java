@@ -2,12 +2,12 @@
 # tasks file for role_java
 
 - name: Install Java Setup from repository
-  import_tasks: install-repo.yml
+  ansible.builtin.import_tasks: install-repo.yml
   when:
     - java_setup == 'repo'
 
 - name: Install Java Setup from binary archive
-  include_tasks: install-binary.yml
+  ansible.builtin.include_tasks: install-binary.yml
   when:
     - java_setup == 'binary'
   with_items: "{{ java_versions }}"

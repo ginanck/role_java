@@ -1,18 +1,18 @@
 ---
 
-- name: create a directory if it does not exist {{ java.filename }}
+- name: "Create a directory if it does not exist - {{ java.filename }}"
   ansible.builtin.file:
     path: "{{ java_path }}"
     state: directory
     mode: '0755'
 
-- name: get stats JDK archive {{ java.filename }}
+- name: "Get stats JDK archive - {{ java.filename }}"
   ansible.builtin.stat:
     path: "{{ java_path }}/{{ java.filename }}"
-    get_checksum: no
+    get_checksum: false
   register: register_java_archive
 
-- name: download {{ java.filename }}
+- name: "Download {{ java.filename }}"
   ansible.builtin.get_url:
     url: "{{ java.url }}"
     dest: "{{ java_path }}"
@@ -22,7 +22,7 @@
     mode: '0755'
   when: not register_java_archive.stat.exists
 
-- name: unarchive file {{ java.filename }}
+- name: "Unarchive file {{ java.filename }}"
   ansible.builtin.unarchive:
     src: "{{ java_path }}/{{ java.filename }}"
     dest: "{{ java_path }}"
@@ -30,7 +30,7 @@
     remote_src: true
   register: register_unarchive
 
-- name: set default Java version
+- name: Set default Java version
   community.general.alternatives:
     name: "{{ alternative }}"
     path: "{{ java_path }}/{{ register_unarchive.files[0] | split('/') | first }}/bin/{{ alternative }}"
@@ -44,8 +44,8 @@
   when:
     - java.default | default(false)
 
-- name: set JAVA_HOME for users
-  include_tasks: user-set-java.yml
+- name: Set JAVA_HOME for users
+  ansible.builtin.include_tasks: user-set-java.yml
   when:
     - java.users is defined
   with_items: "{{ java.users }}"
