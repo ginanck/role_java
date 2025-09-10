@@ -19,3 +19,4 @@ java_versions:
   - version: 20.0.1.9.1
     filename: amazon-corretto-20.0.1.9.1-linux-x64.tar.gz
     url: https://corretto.aws/downloads/resources/20.0.1.9.1/amazon-corretto-20.0.1.9.1-linux-x64.tar.gz
+
