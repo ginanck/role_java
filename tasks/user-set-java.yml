@@ -1,28 +1,38 @@
 ---
 
-- name: get JAVA_HOME for {{ user }} user
-  ansible.builtin.shell: ls -la | grep -i {{ java.version }} | awk '{print $9}' | grep -iv tar.gz
+- name: "Get JAVA_HOME for user - {{ user }}"
+  ansible.builtin.shell: |
+    set -o pipefail
+    ls -la | grep -i {{ java.version }} | awk '{print $9}' | grep -iv tar.gz
   args:
     chdir: "{{ java_path }}/"
+    executable: /bin/bash
   register: result
+  changed_when: false
 
-- name: get {{ user }} user details
+- name: "Get user details - {{ user }}"
   ansible.builtin.getent:
     database: passwd
     key: "{{ user }}"
 
-- name: set Java HOME ~/.bashrc for {{ user }} user
+- name: "Set Java HOME ~/.bashrc for user - {{ user }}"
   ansible.builtin.lineinfile:
     path: "{{ getent_passwd[user][4] }}/.bashrc"
     regexp: '^export JAVA_HOME='
     line: "export JAVA_HOME=\"{{ java_path }}/{{ result.stdout_lines[0] }}\""
     create: true
     state: present
+    owner: "{{ user }}"
+    group: "{{ getent_passwd[user][2] }}"
+    mode: '0644'
 
-- name: set PATH ~/.bashrc for {{ user }} user
+- name: "Set PATH ~/.bashrc for user - {{ user }}"
   ansible.builtin.lineinfile:
     path: "{{ getent_passwd[user][4] }}/.bashrc"
     regexp: '^export PATH='
     line: "export PATH=\"${JAVA_HOME}/bin:$PATH\""
     create: true
     state: present
+    owner: "{{ user }}"
+    group: "{{ getent_passwd[user][2] }}"
+    mode: '0644'
