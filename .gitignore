@@ -2,3 +2,9 @@
 # You should customize this list as applicable to your project.
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
+
+# Shared configuration files (managed by pre-commit)
+.config/
+
+# Shared configuration files (managed by pre-commit)
+.configs/
