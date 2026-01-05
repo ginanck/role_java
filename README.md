@@ -1,183 +1,225 @@
-# role_java
+<!-- DOCSIBLE START -->
+# Ansible Role: role_java
 
-This Ansible role automates the installation and configuration of multiple Java versions on Linux systems. It supports both binary distribution installation (Amazon Corretto) and repository-based installation, providing flexible Java environment management for development and production environments.
 
-## Features
+role_java to setup java
 
-- Install multiple Java versions simultaneously from binary distributions
-- Configure Java alternatives system for version switching
-- Set up JAVA_HOME environment variables for specific users
-- Support for Amazon Corretto JDK versions 8, 11, 17, and 20
-- Repository-based installation option for standard package management
-- Automatic download and extraction of Java distributions
-- User-specific Java environment configuration
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Dependencies](#dependencies)
+- [Role Variables](#role-variables)
+- [Task Overview](#task-overview)
+- [Example Playbook](#example-playbook)
+- [Documentation Maintenance](#documentation-maintenance)
+- [License](#license)
+- [Author Information](#author-information)
 
 ## Requirements
 
-- Target systems must be Linux-based (CentOS, RHEL, Ubuntu, etc.)
-- Ansible 2.1 or higher
-- Internet connectivity for downloading Java distributions (binary setup)
-- sudo privileges on target hosts
-- `community.general` collection for alternatives module
 
-## Role Variables
 
-### Installation Configuration
+- Ansible >= 2.9
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `java_path` | `/opt/java` | Installation directory for Java distributions |
-| `java_setup` | `binary` | Installation method: `binary` for distribution files or `repo` for package manager |
 
-### Java Version Configuration
+- Supported platforms:
+  - Ubuntu (noble)
+  - AlmaLinux (8)
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `java_versions` | See below | List of Java versions to install with their configurations |
 
-#### Default Java Versions
-
-```yaml
-java_versions:
-  - version: 8.372.07.1
-    filename: amazon-corretto-8.372.07.1-linux-x64.tar.gz
-    url: https://corretto.aws/downloads/resources/8.372.07.1/amazon-corretto-8.372.07.1-linux-x64.tar.gz
-    default: true
-  - version: 11.0.19.7.1
-    filename: amazon-corretto-11.0.19.7.1-linux-x64.tar.gz
-    url: https://corretto.aws/downloads/resources/11.0.19.7.1/amazon-corretto-11.0.19.7.1-linux-x64.tar.gz
-    users: ["root"]
-  - version: 17.0.7.7.1
-    filename: amazon-corretto-17.0.7.7.1-linux-x64.tar.gz
-    url: https://corretto.aws/downloads/resources/17.0.7.7.1/amazon-corretto-17.0.7.7.1-linux-x64.tar.gz
-  - version: 20.0.1.9.1
-    filename: amazon-corretto-20.0.1.9.1-linux-x64.tar.gz
-    url: https://corretto.aws/downloads/resources/20.0.1.9.1/amazon-corretto-20.0.1.9.1-linux-x64.tar.gz
-```
-
-### Repository Installation
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `java_package_name` | Not defined | Package name for repository-based installation (e.g., `java-1.8.0-openjdk`) |
 
 ## Dependencies
 
-This role has no dependencies on other Ansible roles.
+
+This role requires the following roles and collections:
+
+
+
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+
+
+**Roles:**
+
+- [role_base](https://github.com/ginanck/role_base.git) (version: master)
+
+
+
+
+**Collections:**
+
+- `community.docker` (>= 4.8.1)
+
+- `community.general` (>= 6.6.1)
+
+- `ansible.posix` (>= 1.5.4)
+
+
+
+To install all dependencies:
+```bash
+ansible-galaxy install -r meta/install_requirements.yml
+```
+
+
+## Role Variables
+
+
+
+### File: `defaults/main.yml`
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+| `java_path` | `/opt/java` | None |
+| `java_setup` | `binary` | None |
+| `java_versions` | `[]` | None |
+| `java_versions.0` | `{}` | None |
+| `java_versions.0.version` | `8.372.07.1` | None |
+| `java_versions.0.filename` | `amazon-corretto-8.372.07.1-linux-x64.tar.gz` | None |
+| `java_versions.0.url` | `https://corretto.aws/downloads/resources/8.372.07.1/amazon-corretto-8.372.07.1-linux-x64.tar.gz` | None |
+| `java_versions.0.default` | `True` | None |
+| `java_versions.1` | `{}` | None |
+| `java_versions.1.version` | `11.0.19.7.1` | None |
+| `java_versions.1.filename` | `amazon-corretto-11.0.19.7.1-linux-x64.tar.gz` | None |
+| `java_versions.1.url` | `https://corretto.aws/downloads/resources/11.0.19.7.1/amazon-corretto-11.0.19.7.1-linux-x64.tar.gz` | None |
+| `java_versions.1.users` | `[]` | None |
+| `java_versions.1.users.0` | `root` | None |
+| `java_versions.2` | `{}` | None |
+| `java_versions.2.version` | `17.0.7.7.1` | None |
+| `java_versions.2.filename` | `amazon-corretto-17.0.7.7.1-linux-x64.tar.gz` | None |
+| `java_versions.2.url` | `https://corretto.aws/downloads/resources/17.0.7.7.1/amazon-corretto-17.0.7.7.1-linux-x64.tar.gz` | None |
+| `java_versions.3` | `{}` | None |
+| `java_versions.3.version` | `20.0.1.9.1` | None |
+| `java_versions.3.filename` | `amazon-corretto-20.0.1.9.1-linux-x64.tar.gz` | None |
+| `java_versions.3.url` | `https://corretto.aws/downloads/resources/20.0.1.9.1/amazon-corretto-20.0.1.9.1-linux-x64.tar.gz` | None |
+
+
+
+
+## Task Overview
+
+
+This role performs the following tasks:
+
+
+### `install-binary.yml`
+
+
+- **Create a directory if it does not exist - {{ java.filename }}**
+- **Get stats JDK archive - {{ java.filename }}**
+- **Download {{ java.filename }}**
+- **Unarchive file {{ java.filename }}**
+- **Set default Java version**
+- **Set JAVA_HOME for users**
+
+
+### `install-repo.yml`
+
+
+- **Install OpenJDK from Repository**
+
+
+### `user-set-java.yml`
+
+
+- **Get JAVA_HOME for user - {{ user }}**
+- **Get user details - {{ user }}**
+- **Set Java HOME ~/.bashrc for user - {{ user }}**
+- **Set PATH ~/.bashrc for user - {{ user }}**
+
+
+### `main.yml`
+
+
+- **Install Java Setup from repository**
+- **Install Java Setup from binary archive**
+
+
+
 
 ## Example Playbook
 
 ```yaml
 ---
-
-- name: Install and configure Jenkins
-  hosts: jenkins
-  become: true
-  become_method: sudo
-  gather_facts: true
-  vars_files:
-    - vault/jenkins.yml
-
+- hosts: all
+  become: yes
   roles:
-    - role: role_base
-      tags: base
     - role: role_java
-      tags: java
-    - role: role_tomcat
-      tags: tomcat
-      when: inventory_hostname in groups['ci_master']
-    - role: role_docker
-      tags: docker
-      when: inventory_hostname in groups['ci_slaves_linux']
-    - role: role_jenkins
-      tags: jenkins
+
+      vars:
+        java_path: /opt/java
+        java_setup: binary
+        java_versions: []
+
 ```
 
-## Configuration
+## Documentation Maintenance
 
-### Ansible Configuration
+### Updating Dependencies
 
-```ini
-[defaults]
-remote_user             = ansible
-host_key_checking       = False
-gathering               = smart
-gather_facts            = false
-forks                   = 5
-collections_paths       = ./collections
-roles_path              = ./roles
-vault_password_file     = vault/vault_pass.txt
-```
+1. **Update** `meta/main.yml`:
+   ```yaml
+   documented_requirements:
+     - src: https://github.com/user/role.git
+       version: master
+     - name: collection.name
+       version: 1.0.0
+   ```
 
-## Usage
+2. **Sync** `meta/install_requirements.yml` with the same requirements
 
-### 1. Prepare Inventory
+3. **Regenerate** documentation:
+   ```bash
+   pre-commit run --all-files
+   ```
 
-```ini
-[jenkins:children]
-ci_master
-ci_slaves
+### Template Updates
 
-[ci_master]
-172.16.2.41 base_hostname=jenkins-master
+- Edit `.docsible_template.md` for structure changes
+- Test with: `docsible --role . --md-template .docsible_template.md -nob -com -tl`
+- Commit both template and generated README.md
 
-[ci_slaves:children]
-ci_slaves_linux
-ci_slaves_windows
+### Quick Checklist
 
-[ci_slaves_linux]
-172.16.2.42 base_hostname=jenkins-slaves-01
-172.16.2.43 base_hostname=jenkins-slaves-02
-
-[ci_slaves_windows]
-```
-
-### 2. Run the Playbook
-
-```bash
-ansible-playbook -i inventory/jenkins.ini playbooks/jenkins.yml --tags java
-```
-
-### 3. Verify Installation
-
-```bash
-# Check installed Java versions
-sudo alternatives --display java
-
-# Verify Java installation
-java -version
-
-# Check JAVA_HOME for specific users
-sudo su - root -c 'echo $JAVA_HOME'
-```
-
-## Operations
-
-### Adding New Java Versions
-
-To add additional Java versions, extend the `java_versions` list in your playbook or inventory:
-
-```yaml
-java_versions:
-  - version: 21.0.1.12.1
-    filename: amazon-corretto-21.0.1.12.1-linux-x64.tar.gz
-    url: https://corretto.aws/downloads/resources/21.0.1.12.1/amazon-corretto-21.0.1.12.1-linux-x64.tar.gz
-    default: false
-    users: ["jenkins", "developer"]
-```
-
-### Switching Default Java Version
-
-Use the alternatives system to switch between installed versions:
-
-```bash
-sudo alternatives --config java
-```
+When updating dependencies:
+- [ ] Add to `meta/main.yml` → `documented_requirements`
+- [ ] Add to `meta/install_requirements.yml`
+- [ ] Run `pre-commit run --all-files`
+- [ ] Verify generated README.md
+- [ ] Commit all changes
 
 ## License
 
-GPL-2.0-or-later
+
+license (GPL-2.0-or-later, MIT, etc)
+
 
 ## Author Information
 
-Gorkem Inanc Korkmaz - NNC Guru
+
+**Author:** gkorkmaz
+
+
+
+
+**GitHub:** [gkorkmaz](https://github.com/gkorkmaz)
+
+---
+*This documentation was automatically generated using [docsible](https://github.com/zbohm/docsible).*
+<!-- DOCSIBLE END -->
