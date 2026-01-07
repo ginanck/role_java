@@ -80,34 +80,36 @@ ansible-galaxy install -r meta/install_requirements.yml
 
 ## Role Variables
 
+**These are static variables with lower priority**
 
 
-### File: `defaults/main.yml`
 
-| Variable | Default Value | Description |
-|----------|---------------|-------------|
-| `java_path` | `/opt/java` | None |
-| `java_setup` | `binary` | None |
-| `java_versions` | `[]` | None |
-| `java_versions.0` | `{}` | None |
-| `java_versions.0.version` | `8.372.07.1` | None |
-| `java_versions.0.filename` | `amazon-corretto-8.372.07.1-linux-x64.tar.gz` | None |
-| `java_versions.0.url` | `https://corretto.aws/downloads/resources/8.372.07.1/amazon-corretto-8.372.07.1-linux-x64.tar.gz` | None |
-| `java_versions.0.default` | `True` | None |
-| `java_versions.1` | `{}` | None |
-| `java_versions.1.version` | `11.0.19.7.1` | None |
-| `java_versions.1.filename` | `amazon-corretto-11.0.19.7.1-linux-x64.tar.gz` | None |
-| `java_versions.1.url` | `https://corretto.aws/downloads/resources/11.0.19.7.1/amazon-corretto-11.0.19.7.1-linux-x64.tar.gz` | None |
-| `java_versions.1.users` | `[]` | None |
-| `java_versions.1.users.0` | `root` | None |
-| `java_versions.2` | `{}` | None |
-| `java_versions.2.version` | `17.0.7.7.1` | None |
-| `java_versions.2.filename` | `amazon-corretto-17.0.7.7.1-linux-x64.tar.gz` | None |
-| `java_versions.2.url` | `https://corretto.aws/downloads/resources/17.0.7.7.1/amazon-corretto-17.0.7.7.1-linux-x64.tar.gz` | None |
-| `java_versions.3` | `{}` | None |
-| `java_versions.3.version` | `20.0.1.9.1` | None |
-| `java_versions.3.filename` | `amazon-corretto-20.0.1.9.1-linux-x64.tar.gz` | None |
-| `java_versions.3.url` | `https://corretto.aws/downloads/resources/20.0.1.9.1/amazon-corretto-20.0.1.9.1-linux-x64.tar.gz` | None |
+#### File: defaults/main.yml
+
+| Var | Type | Value |
+|-----|------|-------|
+| [java_path](defaults/main.yml#L4) | str | `/opt/java` |
+| [java_setup](defaults/main.yml#L5) | str | `binary` |
+| [java_versions](defaults/main.yml#L7) | list |  |
+| [java_versions.0](defaults/main.yml#L8) | dict |  |
+| [java_versions.0.default](defaults/main.yml#L11) | bool | `True` |
+| [java_versions.0.filename](defaults/main.yml#L9) | str | `amazon-corretto-8.372.07.1-linux-x64.tar.gz` |
+| [java_versions.0.url](defaults/main.yml#L10) | str | `https://corretto.aws/downloads/resources/8.372.07.1/amazon-corretto-8.372.07.1-linux-x64.tar.gz` |
+| [java_versions.0.version](defaults/main.yml#L8) | str | `8.372.07.1` |
+| [java_versions.1](defaults/main.yml#L12) | dict |  |
+| [java_versions.1.filename](defaults/main.yml#L13) | str | `amazon-corretto-11.0.19.7.1-linux-x64.tar.gz` |
+| [java_versions.1.url](defaults/main.yml#L14) | str | `https://corretto.aws/downloads/resources/11.0.19.7.1/amazon-corretto-11.0.19.7.1-linux-x64.tar.gz` |
+| [java_versions.1.users](defaults/main.yml#L15) | list |  |
+| [java_versions.1.users.0](defaults/main.yml#L15) | str | `root` |
+| [java_versions.1.version](defaults/main.yml#L12) | str | `11.0.19.7.1` |
+| [java_versions.2](defaults/main.yml#L16) | dict |  |
+| [java_versions.2.filename](defaults/main.yml#L17) | str | `amazon-corretto-17.0.7.7.1-linux-x64.tar.gz` |
+| [java_versions.2.url](defaults/main.yml#L18) | str | `https://corretto.aws/downloads/resources/17.0.7.7.1/amazon-corretto-17.0.7.7.1-linux-x64.tar.gz` |
+| [java_versions.2.version](defaults/main.yml#L16) | str | `17.0.7.7.1` |
+| [java_versions.3](defaults/main.yml#L19) | dict |  |
+| [java_versions.3.filename](defaults/main.yml#L20) | str | `amazon-corretto-20.0.1.9.1-linux-x64.tar.gz` |
+| [java_versions.3.url](defaults/main.yml#L21) | str | `https://corretto.aws/downloads/resources/20.0.1.9.1/amazon-corretto-20.0.1.9.1-linux-x64.tar.gz` |
+| [java_versions.3.version](defaults/main.yml#L19) | str | `20.0.1.9.1` |
 
 
 
@@ -118,37 +120,49 @@ ansible-galaxy install -r meta/install_requirements.yml
 This role performs the following tasks:
 
 
-### `install-binary.yml`
+### File: `tasks/install-binary.yml`
+
+| Task Name | Module | Has Conditions | Line |
+|-----------|--------|----------------|------|
+| [Create a directory if it does not exist - {{ java.filename }}](tasks/install-binary.yml#L) | ansible.builtin.file | No | N/A |
+| [Get stats JDK archive - {{ java.filename }}](tasks/install-binary.yml#L) | ansible.builtin.stat | No | N/A |
+| [Download {{ java.filename }}](tasks/install-binary.yml#L) | ansible.builtin.get_url | Yes | N/A |
+| [Unarchive file {{ java.filename }}](tasks/install-binary.yml#L) | ansible.builtin.unarchive | No | N/A |
+| [Set default Java version](tasks/install-binary.yml#L) | community.general.alternatives | Yes | N/A |
+| [Set JAVA_HOME for users](tasks/install-binary.yml#L) | ansible.builtin.include_tasks | Yes | N/A |
 
 
-- **Create a directory if it does not exist - {{ java.filename }}**
-- **Get stats JDK archive - {{ java.filename }}**
-- **Download {{ java.filename }}**
-- **Unarchive file {{ java.filename }}**
-- **Set default Java version**
-- **Set JAVA_HOME for users**
 
 
-### `install-repo.yml`
+### File: `tasks/install-repo.yml`
+
+| Task Name | Module | Has Conditions | Line |
+|-----------|--------|----------------|------|
+| [Install OpenJDK from Repository](tasks/install-repo.yml#L) | ansible.builtin.yum | No | N/A |
 
 
-- **Install OpenJDK from Repository**
 
 
-### `user-set-java.yml`
+### File: `tasks/user-set-java.yml`
+
+| Task Name | Module | Has Conditions | Line |
+|-----------|--------|----------------|------|
+| [Get JAVA_HOME for user - {{ user }}](tasks/user-set-java.yml#L) | ansible.builtin.shell | No | N/A |
+| [Get user details - {{ user }}](tasks/user-set-java.yml#L) | ansible.builtin.getent | No | N/A |
+| [Set Java HOME ~/.bashrc for user - {{ user }}](tasks/user-set-java.yml#L) | ansible.builtin.lineinfile | No | N/A |
+| [Set PATH ~/.bashrc for user - {{ user }}](tasks/user-set-java.yml#L) | ansible.builtin.lineinfile | No | N/A |
 
 
-- **Get JAVA_HOME for user - {{ user }}**
-- **Get user details - {{ user }}**
-- **Set Java HOME ~/.bashrc for user - {{ user }}**
-- **Set PATH ~/.bashrc for user - {{ user }}**
 
 
-### `main.yml`
+### File: `tasks/main.yml`
+
+| Task Name | Module | Has Conditions | Line |
+|-----------|--------|----------------|------|
+| [Install Java Setup from repository](tasks/main.yml#L) | ansible.builtin.import_tasks | Yes | N/A |
+| [Install Java Setup from binary archive](tasks/main.yml#L) | ansible.builtin.include_tasks | Yes | N/A |
 
 
-- **Install Java Setup from repository**
-- **Install Java Setup from binary archive**
 
 
 
@@ -168,41 +182,6 @@ This role performs the following tasks:
         java_versions: []
 
 ```
-
-## Documentation Maintenance
-
-### Updating Dependencies
-
-1. **Update** `meta/main.yml`:
-   ```yaml
-   documented_requirements:
-     - src: https://github.com/user/role.git
-       version: master
-     - name: collection.name
-       version: 1.0.0
-   ```
-
-2. **Sync** `meta/install_requirements.yml` with the same requirements
-
-3. **Regenerate** documentation:
-   ```bash
-   pre-commit run --all-files
-   ```
-
-### Template Updates
-
-- Edit `.docsible_template.md` for structure changes
-- Test with: `docsible --role . --md-template .docsible_template.md -nob -com -tl`
-- Commit both template and generated README.md
-
-### Quick Checklist
-
-When updating dependencies:
-- [ ] Add to `meta/main.yml` → `documented_requirements`
-- [ ] Add to `meta/install_requirements.yml`
-- [ ] Run `pre-commit run --all-files`
-- [ ] Verify generated README.md
-- [ ] Commit all changes
 
 ## License
 
