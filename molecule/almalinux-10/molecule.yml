@@ -7,14 +7,14 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: ubuntu-2404
-    image: ghcr.io/ginanck/molecule-ubuntu:24.04-latest
+  - name: almalinux-10
+    image: ghcr.io/ginanck/molecule-almalinux:10-latest
     pre_build_image: true
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-    command: /lib/systemd/systemd
+    command: /usr/sbin/init
     tmpfs:
       - /run
       - /tmp
@@ -26,9 +26,9 @@ provisioner:
     ANSIBLE_COLLECTIONS_PATH: ../../collections
   inventory:
     host_vars:
-      ubuntu-2404:
+      almalinux-10:
         ansible_user: root
-        base_hostname: "ubuntu-2404"
+        base_hostname: "almalinux-10"
   playbooks:
     converge: ../resources/converge.yml
     prepare: ../resources/prepare.yml

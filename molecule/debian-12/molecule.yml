@@ -7,8 +7,8 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: ubuntu-2404
-    image: ghcr.io/ginanck/molecule-ubuntu:24.04-latest
+  - name: debian-12
+    image: ghcr.io/ginanck/molecule-debian:12-latest
     pre_build_image: true
     privileged: true
     volumes:
@@ -26,9 +26,9 @@ provisioner:
     ANSIBLE_COLLECTIONS_PATH: ../../collections
   inventory:
     host_vars:
-      ubuntu-2404:
+      debian-12:
         ansible_user: root
-        base_hostname: "ubuntu-2404"
+        base_hostname: "debian-12"
   playbooks:
     converge: ../resources/converge.yml
     prepare: ../resources/prepare.yml
