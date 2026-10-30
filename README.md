@@ -138,7 +138,7 @@ This role performs the following tasks:
 
 | Task Name | Module | Has Conditions | Line |
 |-----------|--------|----------------|------|
-| [Install OpenJDK from Repository](tasks/install-repo.yml#L) | ansible.builtin.yum | No | N/A |
+| [Install OpenJDK from Repository](tasks/install-repo.yml#L) | ansible.builtin.package | No | N/A |
 
 
 
